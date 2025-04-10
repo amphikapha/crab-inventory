@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,53 +9,52 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Toaster, toast } from 'react-hot-toast'
-import { PlusCircle, RefreshCw, Loader2, Package } from "lucide-react"
+} from "@/components/ui/dialog";
+import { Toaster, toast } from "react-hot-toast";
+import { PlusCircle, RefreshCw, Loader2, Package } from "lucide-react";
 import { getMe } from "@/actions/user/getme";
-import { getProducts } from "../actions/product/get-product"
-import { addProduct as addProductAPI } from "../actions/product/add-product"
-import { updateProduct } from "../actions/product/update-product"
-import { deleteProduct } from "../actions/product/delete-product"
-import { buyProduct } from "../actions/product/buy-product"
+import { getProducts } from "../actions/product/get-product";
+import { addProduct as addProductAPI } from "../actions/product/add-product";
+import { updateProduct } from "../actions/product/update-product";
+import { deleteProduct } from "../actions/product/delete-product";
+import { buyProduct } from "../actions/product/buy-product";
 import ProductTable from "@/components/homepage/ProductTable";
 import ProductCard from "@/components/homepage/ProductCard";
 import ProductForm from "@/components/homepage/ProductForm";
 import DeleteDialog from "@/components/homepage/DeleteDialog";
 import BuyDialog from "@/components/homepage/BuyDialog";
-import { Product } from "@/types/product"
-import { User } from "@/types/user"
+import { Product } from "@/types/product";
+import { User } from "@/types/user";
 import { Navbar } from "@/components/navbar";
 
 export default function ProductManagement() {
   const [user, setUser] = useState<User | null>(null);
-  const [products, setProducts] = useState<Product[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [isBuyDialogOpen, setIsBuyDialogOpen] = useState(false)
-  const [buyId, setBuyId] = useState<number | null>(null)
-  const [buyQuantity, setBuyQuantity] = useState<number>(1)
-  const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isBuyDialogOpen, setIsBuyDialogOpen] = useState(false);
+  const [buyId, setBuyId] = useState<string | null>(null);
+  const [buyQuantity, setBuyQuantity] = useState<number>(1);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [newProduct, setNewProduct] = useState({
     name: "",
     price: 0,
     quantity: 0,
     description: "",
     category: "อื่นๆ",
-  })
+  });
   const [editProduct, setEditProduct] = useState({
-    id: 0,
+    id: "0",
     name: "",
     price: 0,
     quantity: 0,
     description: "",
     category: "",
-  })
-
+  });
 
   const fetchUser = async () => {
     try {
@@ -63,99 +62,107 @@ export default function ProductManagement() {
       if (userData) {
         setUser(userData);
         setIsAdmin(userData.role === "ROLE_ADMIN");
-      } 
+      }
     } catch (error) {
       toast.error("Failed to fetch user data.");
-
     }
   };
 
+  // useEffect(() => {
+  //   fetchUser();
+  // }, []);
+
+  // useEffect(() => {
+  //   if (user) {
+  //     fetchProducts();
+  //   }
+  // }, [user]);
+
   useEffect(() => {
-    fetchUser();
+    fetchProducts();
+    setIsAdmin(true);
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      fetchProducts(); 
-    }
-  }, [user]);
-
   const fetchProducts = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const response = await getProducts()
-      setProducts(Array.isArray(response) ? response : [])
+      const response = await getProducts();
+      setProducts(Array.isArray(response) ? response : []);
     } catch (error) {
-      toast.error("Cannot fetch products. Please try again.")
+      toast.error("Cannot fetch products. Please try again.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const addProduct = async () => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
-      const response = await addProductAPI(newProduct as Product)
-      setProducts([...products, response])
+      const response = await addProductAPI(newProduct as Product);
+      setProducts([...products, response]);
       setNewProduct({
         name: "",
         price: 0,
         quantity: 0,
         description: "",
         category: "อื่นๆ",
-      })
-      setIsAddDialogOpen(false)
-      toast.success("Added new product successfully")
+      });
+      setIsAddDialogOpen(false);
+      toast.success("Added new product successfully");
     } catch (error) {
-      toast.error("Cannot add product. Please try again.")
+      toast.error("Cannot add product. Please try again.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleUpdateProduct = async () => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
-      const response = await updateProduct(editProduct.id, editProduct)
-      const updatedProducts = products.map((product) => (product.id === editProduct.id ? editProduct : product))
-      setProducts(updatedProducts)
-      setIsEditDialogOpen(false)
-      toast.success("Updated product successfully")
+      const response = await updateProduct(editProduct.id, editProduct);
+      const updatedProducts = products.map((product) =>
+        product.id === editProduct.id ? editProduct : product
+      );
+      setProducts(updatedProducts);
+      setIsEditDialogOpen(false);
+      toast.success("Updated product successfully");
     } catch (error) {
-      toast.error("Cannot update product. Please try again.")
+      toast.error("Cannot update product. Please try again.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleDeleteProduct = async () => {
-    if (deleteId === null) return
-    setIsSubmitting(true)
+    if (deleteId === null) return;
+    setIsSubmitting(true);
     try {
-      const response = await deleteProduct(deleteId)
-      const filteredProducts = products.filter((product) => product.id !== deleteId)
-      setProducts(filteredProducts)
-      setIsDeleteDialogOpen(false)
-      toast.success("Deleted product successfully")
+      const response = await deleteProduct(deleteId);
+      const filteredProducts = products.filter(
+        (product) => product.id !== deleteId
+      );
+      setProducts(filteredProducts);
+      setIsDeleteDialogOpen(false);
+      toast.success("Deleted product successfully");
     } catch (error) {
-      toast.error("Cannot delete product. Please try again.")
+      toast.error("Cannot delete product. Please try again.");
     } finally {
-      setIsSubmitting(false)
-      setDeleteId(null)
+      setIsSubmitting(false);
+      setDeleteId(null);
     }
-  }
+  };
 
   const openEditDialog = (product: Product) => {
-    setEditProduct({ ...product, id: product.id ?? 0 })
-    setIsEditDialogOpen(true)
-  }
+    setEditProduct({ ...product, id: product.id ?? "0" });
+    setIsEditDialogOpen(true);
+  };
 
-  const openDeleteDialog = (id: number) => {
-    setDeleteId(id)
-    setIsDeleteDialogOpen(true)
-  }
+  const openDeleteDialog = (id: string) => {
+    setDeleteId(id);
+    setIsDeleteDialogOpen(true);
+  };
 
-  const openBuyDialog = (id: number, quantity: number) => {
+  const openBuyDialog = (id: string, quantity: number) => {
     setBuyId(id);
     setBuyQuantity(quantity);
     setIsBuyDialogOpen(true);
@@ -184,8 +191,12 @@ export default function ProductManagement() {
         <div className="max-w-7xl mx-auto space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Bakery Shop System</h1>
-              <p className="text-muted-foreground mt-1">Freshly Baked for You</p>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                Bakery Shop System
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Freshly Baked for You
+              </p>
             </div>
 
             <div className="flex flex-wrap gap-2">
@@ -195,12 +206,19 @@ export default function ProductManagement() {
                 disabled={isLoading}
                 className="gap-2 flex-1 sm:flex-none"
               >
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
                 <span className="sm:inline">Refresh</span>
               </Button>
 
               {isAdmin && (
-                <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                <Dialog
+                  open={isAddDialogOpen}
+                  onOpenChange={setIsAddDialogOpen}
+                >
                   <DialogTrigger asChild>
                     <Button className="gap-2 flex-1 sm:flex-none">
                       <PlusCircle className="h-4 w-4" />
@@ -210,7 +228,9 @@ export default function ProductManagement() {
                   <DialogContent className="sm:max-w-[500px] w-[95vw] max-w-full mx-auto">
                     <DialogHeader>
                       <DialogTitle>Add new product</DialogTitle>
-                      <DialogDescription>Enter the Product Details</DialogDescription>
+                      <DialogDescription>
+                        Enter the Product Details
+                      </DialogDescription>
                     </DialogHeader>
                     <ProductForm
                       product={newProduct}
@@ -241,13 +261,13 @@ export default function ProductManagement() {
             ) : (
               <>
                 <div className="hidden md:block overflow-x-auto">
-                <ProductTable
-                  products={products}
-                  isAdmin={isAdmin}
-                  onEdit={openEditDialog}
-                  onDelete={openDeleteDialog}
-                  onBuy={openBuyDialog}
-                />
+                  <ProductTable
+                    products={products}
+                    isAdmin={isAdmin}
+                    onEdit={openEditDialog}
+                    onDelete={openDeleteDialog}
+                    onBuy={openBuyDialog}
+                  />
                 </div>
 
                 <div className="flex flex-col bg-transparent gap-4 md:hidden">
@@ -271,14 +291,18 @@ export default function ProductManagement() {
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Edit Product</DialogTitle>
-              <DialogDescription>Edit Product Information ID: {editProduct.id}</DialogDescription>
+              <DialogDescription>
+                Edit Product Information ID: {editProduct.id}
+              </DialogDescription>
             </DialogHeader>
             <ProductForm
               product={editProduct}
               onSubmit={handleUpdateProduct}
               onCancel={() => setIsEditDialogOpen(false)}
               isSubmitting={isSubmitting}
-              onChange={(product) => setEditProduct({ ...product, id: product.id ?? 0 })}
+              onChange={(product) =>
+                setEditProduct({ ...product, id: product.id ?? "0" })
+              }
             />
           </DialogContent>
         </Dialog>
@@ -302,5 +326,5 @@ export default function ProductManagement() {
         <Toaster />
       </div>
     </div>
-  )
+  );
 }

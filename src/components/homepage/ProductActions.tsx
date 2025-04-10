@@ -38,7 +38,9 @@ export default function ProductActions({
         <Button
           variant="outline"
           size={isCardView ? "icon" : "default"}
-          className={`${isCardView ? "h-8 w-8" : ""} text-destructive hover:text-destructive`}
+          className={`${
+            isCardView ? "h-8 w-8" : ""
+          } text-destructive hover:text-destructive`}
           onClick={() => product.id !== undefined && onDelete(product.id)}
         >
           <Trash2 className={isCardView ? "h-3.5 w-3.5" : "h-4 w-4"} />

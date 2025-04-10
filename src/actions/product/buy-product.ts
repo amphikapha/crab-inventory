@@ -1,11 +1,14 @@
-'use server';
+"use server";
 
 import { cookies } from "next/headers";
-import { config } from "@/app/config"
+import { config } from "@/app/config";
 
-export const buyProduct = async (productId: number, quantity: number): Promise<string> => {
+export const buyProduct = async (
+  productId: string,
+  quantity: number
+): Promise<string> => {
   const cookieStore = await cookies();
-  const token = cookieStore.get('auth-token');
+  const token = cookieStore.get("auth-token");
 
   if (!token) {
     throw new Error("No token found");
